@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nta PUBLIC "-//Uppaal Team//DTD Flat System 1.1//EN" "http://www.it.uu.se/research/group/darts/uppaal/flat-1_1.dtd">
+
+<nta>
+  <declaration>broadcast chan ack;broadcast chan send;bool ack1 = true;bool send1 = true;</declaration>
+  <template>
+    <name>Output</name>
+    <declaration>clock x;</declaration>
+    <location id="Output1">
+      <name>Output1</name>
+    </location>
+    <location id="Output2">
+      <name>Output2</name>
+      <committed/>
+    </location>
+    <location id="Output3">
+      <name>Output3</name>
+    </location>
+    <init ref="Output1"/>
+    <transition>
+      <source ref="Output1"/>
+      <target ref="Output2"/>
+      <label kind="synchronisation">send!</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1 &amp;&amp; send1==true</label>
+      <label kind="assignment">x:=0</label>
+    </transition>
+    <transition>
+      <source ref="Output2"/>
+      <target ref="Output3"/>
+      <label kind="synchronisation">output?</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1</label>
+      <label kind="assignment">x:=0</label>
+    </transition>
+    <transition>
+      <source ref="Output3"/>
+      <target ref="Output1"/>
+      <label kind="synchronisation">ack!</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1 &amp;&amp; ack1==true</label>
+      <label kind="assignment">x:=0</label>
+    </transition>
+  </template>
+  <template>
+    <name>assume</name>
+    <declaration>clock x;</declaration>
+    <location id="assume1">
+      <name>assume1</name>
+      <committed/>
+    </location>
+    <location id="assume2">
+      <name>assume2</name>
+      <committed/>
+    </location>
+    <init ref="assume1"/>
+    <transition>
+      <source ref="assume1"/>
+      <target ref="assume1"/>
+      <label kind="synchronisation">send?</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1000</label>
+      <label kind="assignment">x:=0, ack1=true,send1=false, send1=true</label>
+    </transition>
+    <transition>
+      <source ref="assume1"/>
+      <target ref="assume1"/>
+      <label kind="synchronisation">ack?</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1000</label>
+      <label kind="assignment">x:=0,ack1=false, ack1=true, send1=true</label>
+    </transition>
+    <transition>
+      <source ref="assume2"/>
+      <target ref="assume2"/>
+      <label kind="synchronisation">ack?</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1000</label>
+      <label kind="assignment">x:=0,ack1=false, ack1=true, send1=true</label>
+    </transition>
+    <transition>
+      <source ref="assume2"/>
+      <target ref="assume2"/>
+      <label kind="synchronisation">send?</label>
+      <label kind="guard">x &gt;=0 &amp;&amp; x&lt;1000</label>
+      <label kind="assignment">x:=0, ack1=true,send1=false, send1=true</label>
+    </transition>
+  </template>
+  <system>system Output,assume;</system>
+</nta>

@@ -1,0 +1,1 @@
+verifyta -t1 -S2 -f uppaalNta.xtr  uppaalNta.xml uppaalNta.q > uppaalNta.txt
