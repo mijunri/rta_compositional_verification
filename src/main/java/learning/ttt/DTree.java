@@ -146,7 +146,8 @@ public class DTree {
         }
         TimeWords u = TimeWordsUtil.getFirstN(ce,j);
         Location qu = hypothesis.traceToLocationByTimeWord(u);
-        TimeWord w = ce.get(j+1);
+        //j为0，那么应得到第一个word
+        TimeWord w = ce.get(j);
         TimeWords v = TimeWordsUtil.concat(u,w);
         Node node = sift(v);
         int id = nodeList.indexOf(node)+1;
@@ -162,11 +163,14 @@ public class DTree {
 
         //更新guard
         if(!isPass){
-            Guard guard = new Guard(u,v,w);
+            TimeWords sourceWords = nodeList.get(qu.getId()-1).getSuffix();
+            TimeWords targetWords = nodeList.get(qv.getId()-1).getSuffix();
+            Guard guard = new Guard(sourceWords,targetWords,w);
             guardSet.add(guard);
         }
         //增加状态
         else {
+            v = nodeList.get(qv.getId()-1).getSuffix();
             Node replacedNode = getNode(v);
             TimeWords words = TimeWordsUtil.getLastByN(ce,j+1);
             replacedNode.setSuffix(words);
@@ -176,19 +180,25 @@ public class DTree {
             boolean var = membership.answer(answerWords);
             if(var){
                 boolean init1 = newWords1.equals(TimeWords.EMPTY_WORDS);
-                Node node1 = new Node(init1,true,newWords1);
+                boolean accpted1 = membership.answer(newWords1);
+                Node node1 = new Node(init1,accpted1,newWords1);
                 replacedNode.setRightChild(node1);
                 boolean init2 = newWords2.equals(TimeWords.EMPTY_WORDS);
-                Node node2 = new Node(init2,false,newWords2);
+                boolean accpted2 = membership.answer(newWords2);
+                Node node2 = new Node(init2,accpted2,newWords2);
                 replacedNode.setLeftChild(node2);
             }else {
                 boolean init1 = newWords1.equals(TimeWords.EMPTY_WORDS);
-                Node node1 = new Node(init1,false,newWords1);
+                boolean accpted1 = membership.answer(newWords1);
+                Node node1 = new Node(init1,accpted1,newWords1);
                 replacedNode.setLeftChild(node1);
                 boolean init2 = newWords2.equals(TimeWords.EMPTY_WORDS);
-                Node node2 = new Node(init2,true,newWords2);
+                boolean accpted2 = membership.answer(newWords2);
+                Node node2 = new Node(init2,accpted2,newWords2);
                 replacedNode.setRightChild(node2);
             }
+
+            refineMap();
 
             //更新到v节点的迁移
             for(Node l:nodeList){
@@ -232,6 +242,7 @@ public class DTree {
 
     private TimeWords gama(TimeWords words, int j){
         TimeWords w = TimeWordsUtil.getFirstN(words,j);
+        hypothesis = this.tranToRTA();
         Location location = hypothesis.traceToLocationByTimeWord(w);
         int index = location.getId()-1;
         TimeWords prefix = getleafs().get(index).getSuffix();
@@ -270,8 +281,8 @@ public class DTree {
                 leafMap.put(suffix,node);
             }
             else {
-                Node left = root.getLeftChild();
-                Node right = root.getRightChild();
+                Node left = node.getLeftChild();
+                Node right = node.getRightChild();
                 if(left!=null){
                     queue.add(left);
                 }

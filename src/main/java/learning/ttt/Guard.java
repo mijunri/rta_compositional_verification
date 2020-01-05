@@ -52,4 +52,13 @@ public class Guard {
         boolean var3 = word.equals(guard.word);
         return var1 && var2 && var3;
     }
+
+    @Override
+    public String toString() {
+        return "Guard{" +
+                "sourceLabel=" + sourceLabel +
+                ", targetLabel=" + targetLabel +
+                ", word=" + word +
+                '}';
+    }
 }

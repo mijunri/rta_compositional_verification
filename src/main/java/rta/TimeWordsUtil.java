@@ -54,7 +54,7 @@ public class TimeWordsUtil {
             return TimeWords.EMPTY_WORDS;
         }
         List<TimeWord> wordList = words.getWordList();
-        List<TimeWord> wordList1 = wordList.subList(0,n-1);
+        List<TimeWord> wordList1 = wordList.subList(0,n);
         return new TimeWords(wordList1);
     }
 
